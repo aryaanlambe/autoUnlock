@@ -1,0 +1,76 @@
+#!/bin/bash
+#------------------
+# BUILD 1.0
+#------------------
+
+
+#----------------------------------------------------------------------------------------------------------
+
+# A simple shell script to lock & unlock linux desktop.
+# ONLY WORKS ON LINUX (TESTED ON UBUNTU 16.04.5 LTS. NOT TESTED ON ANY OTHER DISTRO AS OF LAST BUILD DATE).
+# First consult README for initial configuration instructions before going any furthur.
+# ----------------------------------------------------------------------------
+# SCRIPT TAILORED BY ARYAAN, INIT. BUILD FROM echowarp
+# ----------------------------------------------------------------------------                              
+
+#----------------------------------------------------------------------------------------------------------\
+
+
+#Replace below line in "" with your USB ID, while retaining the ""
+id="ID "
+
+#This part of the script runs every 2 seconds
+
+for ((i=0; i<=30; i++))
+do
+if [ -z "`lsusb | grep "$id"`" ]
+then
+
+    echo "Device is NOT plugged in"
+
+    if [ -n "`DISPLAY=:0.0 gnome-screensaver-command --query | grep "is active"`" ]
+    then
+    if [ -e /tmp/autoUnlock.lock ]
+    then
+
+    #Crontab entry unlock the screen
+
+    rm /tmp/autoUnlock.lock
+
+fi
+
+elif [ -e /tmp/autoUnlock.lock ]
+then
+
+
+#Crontab entry to lock the screen
+
+    DISPLAY=:0.0 gnome-screensaver-command --lock
+
+    rm /tmp/autoUnlock.lock
+
+fi
+else
+
+    echo "USB Connected"
+    if [ ! -e /tmp/autoUnlock.lock ]
+    then
+    DISPLAY=:0.0 gnome-screensaver-command --deactivate
+    DISPLAY=:0.0 notify-send -t 5000 --icon=dialog-info "Computer Unlocked" "Welcome Back!"
+
+# CANNOT EDIT TIMEOUT SETTINGS HERE SINCE NOTIFICATION TIMEOUT IS HANDLED BY UNITY
+
+    touch /tmp/autoUnlock.lock
+
+
+
+# Uncommenting the following 3 lines will make the device alert you if you lock without disconnecting USB. Wouldn't recommend doing anything here unless you know what you're doing
+
+    echo "Don't forget your device!" > /tmp/usbReminder
+    DISPLAY=:0 festival --tts /tmp/usbReminder
+    rm /tmp/usbReminder
+    fi
+
+fi
+sleep 2
+done
