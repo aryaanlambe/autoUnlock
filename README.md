@@ -1,5 +1,6 @@
 # autoUnlock
 :lock: or :unlock: your Ubuntu box via USB
+Tested on Ubuntu 16.04LTS
 
 ## Usage Instructions:
 
